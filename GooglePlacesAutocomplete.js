@@ -639,7 +639,9 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _handleChangeText = (text) => {
     this._onChangeText(text);
-
+    if (this.props.setAddress) {
+      this.props.setAddress(text);
+    }
     const onChangeText =
       this.props &&
       this.props.textInputProps &&
@@ -647,6 +649,9 @@ export default class GooglePlacesAutocomplete extends Component {
 
     if (onChangeText) {
       onChangeText(text);
+    }
+    if (this.props.setAddressData) {
+      this.props.setAddressData(this.state.dataSource);
     }
   };
 
@@ -882,6 +887,13 @@ export default class GooglePlacesAutocomplete extends Component {
     );
 
   };
+
+  _setAddressData = () => {
+    if (this.props.setAddressData) {
+      this.props.setAddressData(this.state.dataSource);
+    }
+  }
+
   render() {
     let {
       onFocus,
@@ -919,25 +931,41 @@ export default class GooglePlacesAutocomplete extends Component {
                 this.props.suppressDefaultStyles ? {} : defaultStyles.textInput,
                 this.props.styles.textInput,
               ]}
-              value={this.state.text}
+              value={this.props.value !== undefined ? this.props.value : this.state.text}
               placeholder={this.props.placeholder}
               onSubmitEditing={this.props.onSubmitEditing}
               placeholderTextColor={this.props.placeholderTextColor}
               onFocus={
                 onFocus
                   ? () => {
+                    if (this.props.focusTextInput) {
+                      this.props.focusTextInput();
+                    }
                     this._onFocus();
                     onFocus();
                   }
-                  : this._onFocus
+                  : () => {
+                    this._onFocus();
+                    if (this.props.focusTextInput) {
+                      this.props.focusTextInput();
+                    }
+                  }
               }
               onBlur={
                 onBlur
                   ? () => {
+                    if (this.props.blurTextInput) {
+                      this.props.blurTextInput();
+                    }
                     this._onBlur();
                     onBlur();
                   }
-                  : this._onBlur
+                  : () => {
+                    if (this.props.blurTextInput) {
+                      this.props.blurTextInput();
+                    }
+                    this._onBlur();
+                  }
               }
               underlineColorAndroid={this.props.underlineColorAndroid}
               clearButtonMode={
@@ -949,7 +977,7 @@ export default class GooglePlacesAutocomplete extends Component {
             {this._renderRightButton()}
           </View>
         )}
-        {this._getFlatList()}
+        {!this.props.hideRow && this._getFlatList()}
         {this.props.children}
       </View>
     );
@@ -1006,6 +1034,11 @@ GooglePlacesAutocomplete.propTypes = {
   textInputProps: PropTypes.object,
   timeout: PropTypes.number,
   underlineColorAndroid: PropTypes.string,
+  setAddress: PropTypes.func,
+  setAddressData: PropTypes.func,
+  hideRow: PropTypes.bool,
+  focusTextInput: PropTypes.func,
+  blurTextInput: PropTypes.func
 };
 
 GooglePlacesAutocomplete.defaultProps = {
