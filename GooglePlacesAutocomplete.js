@@ -819,6 +819,7 @@ export default class GooglePlacesAutocomplete extends Component {
       return this.props.renderRightButton();
     }
   };
+  
 
 
   _getFlatList = () => {
@@ -840,7 +841,11 @@ export default class GooglePlacesAutocomplete extends Component {
 
           }
           {this.props.renderDefaultCurrentLocation && (
-            this.props.renderDefaultCurrentLocation(this.state.loadCurrentLocation, this._getRowLoader, loadDefaultCurrentLocation)
+            //this.props.renderDefaultCurrentLocation(this.state.loadCurrentLocation, this._getRowLoader, loadDefaultCurrentLocation)
+            this.props.renderDefaultCurrentLocation(this.props.getCurrentLocationFunction((text) => {
+              this.setState({ text: text })
+              this._handleChangeText(text)
+            }))
           )}
 
         </View>
@@ -1020,6 +1025,7 @@ GooglePlacesAutocomplete.propTypes = {
   renderLeftButton: PropTypes.func,
   renderRightButton: PropTypes.func,
   renderDefaultCurrentLocation: PropTypes.func,
+  getCurrentLocationFunction: PropTypes.func,
   renderDescriptionHeader: PropTypes.func,
   renderCurrentText: PropTypes.func,
   renderRow: PropTypes.func,
